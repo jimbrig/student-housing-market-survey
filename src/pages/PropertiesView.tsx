@@ -3,8 +3,9 @@ import { subjectProperties, competitorProperties } from '../data/mockData';
 import { PropertyCard } from '../components/PropertyCard';
 import { Select } from '../components/ui/Select';
 import { Button } from '../components/ui/Button';
-import { Grid, List, Search, Filter, ArrowUpDown, Download, Building } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card';
+import { Grid, List, Search, Filter, ArrowUpDown, Download, Building, Info, ExternalLink } from 'lucide-react';
+import { Card, CardContent } from '../components/ui/Card';
+import { Badge } from '../components/ui/Badge';
 
 interface PropertiesViewProps {
   onViewPropertyDetails: (id: string) => void;
@@ -58,6 +59,22 @@ export const PropertiesView: React.FC<PropertiesViewProps> = ({ onViewPropertyDe
     }
   });
 
+  const getOccupancyColor = (rate: number) => {
+    if (rate >= 0.95) return 'bg-green-600';
+    if (rate >= 0.90) return 'bg-blue-600';
+    if (rate >= 0.85) return 'bg-yellow-500';
+    return 'bg-red-500';
+  };
+
+  const formatCurrency = (value: number) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(value);
+  };
+
   const renderComparisonView = () => (
     <Card className="mt-6">
       <div className="overflow-x-auto">
@@ -65,79 +82,103 @@ export const PropertiesView: React.FC<PropertiesViewProps> = ({ onViewPropertyDe
           <thead>
             <tr className="bg-gray-50 border-b border-gray-200">
               <th className="px-4 py-3 text-left font-medium text-gray-500">Property</th>
+              <th className="px-4 py-3 text-left font-medium text-gray-500">Management</th>
               <th className="px-4 py-3 text-left font-medium text-gray-500">Distance</th>
-              <th className="px-4 py-3 text-left font-medium text-gray-500">Units</th>
-              <th className="px-4 py-3 text-left font-medium text-gray-500">Beds</th>
+              <th className="px-4 py-3 text-left font-medium text-gray-500">Units/Beds</th>
               <th className="px-4 py-3 text-left font-medium text-gray-500">Occupancy</th>
-              <th className="px-4 py-3 text-left font-medium text-gray-500">Avg. Rent</th>
               <th className="px-4 py-3 text-left font-medium text-gray-500">Pre-lease</th>
+              <th className="px-4 py-3 text-left font-medium text-gray-500">Avg. Rent</th>
               <th className="px-4 py-3 text-left font-medium text-gray-500">Class</th>
+              <th className="px-4 py-3 text-left font-medium text-gray-500">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
             {sortedProperties.map((property) => (
               <tr 
                 key={property.id}
-                className="hover:bg-gray-50 cursor-pointer"
-                onClick={() => onViewPropertyDetails(property.id)}
+                className="hover:bg-gray-50 group"
               >
                 <td className="px-4 py-3">
                   <div className="flex items-center">
-                    <div className="h-10 w-10 flex-shrink-0">
+                    <div className="h-12 w-12 flex-shrink-0">
                       <img 
                         src={property.imageUrl} 
                         alt={property.name}
-                        className="h-10 w-10 rounded-md object-cover"
+                        className="h-12 w-12 rounded-md object-cover"
                       />
                     </div>
                     <div className="ml-4">
                       <div className="font-medium text-gray-900">{property.name}</div>
-                      <div className="text-gray-500 text-xs">{property.address}</div>
+                      <div className="text-gray-500 text-xs truncate max-w-xs">{property.address}</div>
                     </div>
                   </div>
                 </td>
                 <td className="px-4 py-3 text-gray-500">
-                  {property.distanceToCampus} mi
+                  {property.managementCompany}
                 </td>
                 <td className="px-4 py-3 text-gray-500">
-                  {property.totalUnits}
-                </td>
-                <td className="px-4 py-3 text-gray-500">
-                  {property.totalBeds}
+                  {property.distanceToCampus.toFixed(1)} mi
                 </td>
                 <td className="px-4 py-3">
-                  <div className="flex items-center">
-                    <div className="w-16 bg-gray-200 rounded-full h-2 mr-2">
+                  <div className="text-gray-900">{property.totalUnits} units</div>
+                  <div className="text-gray-500 text-xs">{property.totalBeds} beds</div>
+                </td>
+                <td className="px-4 py-3">
+                  <div className="flex items-center space-x-2">
+                    <div className="w-24 bg-gray-200 rounded-full h-2">
                       <div 
-                        className="bg-blue-600 h-2 rounded-full" 
+                        className={`${getOccupancyColor((property as any).occupancyRate)} h-2 rounded-full transition-all duration-300`}
                         style={{ width: `${(property as any).occupancyRate * 100}%` }}
                       />
                     </div>
-                    <span className="text-gray-500">
+                    <span className="text-gray-700 font-medium">
                       {((property as any).occupancyRate * 100).toFixed(1)}%
                     </span>
                   </div>
                 </td>
-                <td className="px-4 py-3 text-gray-500">
-                  ${(property as any).averageRent?.toLocaleString()}
-                </td>
                 <td className="px-4 py-3">
-                  <div className="flex items-center">
-                    <div className="w-16 bg-gray-200 rounded-full h-2 mr-2">
+                  <div className="flex items-center space-x-2">
+                    <div className="w-24 bg-gray-200 rounded-full h-2">
                       <div 
-                        className="bg-green-600 h-2 rounded-full" 
+                        className="bg-green-600 h-2 rounded-full transition-all duration-300"
                         style={{ width: `${(property as any).preleaseRate * 100}%` }}
                       />
                     </div>
-                    <span className="text-gray-500">
+                    <span className="text-gray-700 font-medium">
                       {((property as any).preleaseRate * 100).toFixed(1)}%
                     </span>
                   </div>
                 </td>
                 <td className="px-4 py-3">
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                    {property.classification}
+                  <span className="font-medium text-gray-900">
+                    {formatCurrency((property as any).averageRent)}
                   </span>
+                </td>
+                <td className="px-4 py-3">
+                  <Badge 
+                    variant={property.classification === 'A' ? 'primary' : 'secondary'}
+                    size="sm"
+                  >
+                    Class {property.classification}
+                  </Badge>
+                </td>
+                <td className="px-4 py-3">
+                  <div className="flex items-center space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="p-1"
+                      onClick={() => onViewPropertyDetails(property.id)}
+                      icon={<Info size={16} />}
+                    />
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="p-1"
+                      onClick={() => window.open(property.imageUrl, '_blank')}
+                      icon={<ExternalLink size={16} />}
+                    />
+                  </div>
                 </td>
               </tr>
             ))}
@@ -172,6 +213,13 @@ export const PropertiesView: React.FC<PropertiesViewProps> = ({ onViewPropertyDe
         </div>
         
         <div className="flex items-center space-x-3">
+          <Select
+            options={sortOptions}
+            value={sortBy}
+            onChange={(value) => setSortBy(value as SortOption)}
+            className="w-48"
+          />
+          
           <Button
             variant="outline"
             icon={<Download size={16} />}
