@@ -20,12 +20,52 @@
 .custom-popup .leaflet-popup-content-wrapper {
   border-radius: 0.5rem;
   padding: 0;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
 
 .custom-popup .leaflet-popup-content {
   margin: 0;
+  min-width: 200px;
 }
 
 .custom-popup .leaflet-popup-tip-container {
   margin-top: -1px;
+}
+
+.custom-popup .leaflet-popup-tip {
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+}
+
+.market-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 0.2;
+  }
+}
+
+.market-hover {
+  transition: all 0.3s ease;
+}
+
+.market-hover:hover {
+  transform: scale(1.1);
+}
+
+.leaflet-marker-icon {
+  transition: all 0.3s ease;
+}
+
+.leaflet-marker-icon:hover {
+  transform: scale(1.1) translateY(-5px);
+}
+
+.map-controls {
+  backdrop-filter: blur(8px);
+  background-color: rgba(255, 255, 255, 0.9);
 }
