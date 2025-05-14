@@ -51,7 +51,10 @@ const MapView: React.FC<MapViewProps> = ({
         const points = properties.map(p => turf.point([p.coordinates.longitude, p.coordinates.latitude]));
         const collection = turf.featureCollection(points);
         const center = turf.center(collection);
-        const radius = turf.radiusOfGyration(collection);
+        
+        // Calculate radius as the distance between center and the furthest point
+        const distances = points.map(point => turf.distance(center, point));
+        const radius = Math.max(...distances) * 1000; // Convert to meters
 
         marketMap.set(city, {
           name: city,
