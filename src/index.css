@@ -11,3 +11,21 @@
   background: transparent;
   border: none;
 }
+
+.custom-market-icon {
+  background: transparent;
+  border: none;
+}
+
+.custom-popup .leaflet-popup-content-wrapper {
+  border-radius: 0.5rem;
+  padding: 0;
+}
+
+.custom-popup .leaflet-popup-content {
+  margin: 0;
+}
+
+.custom-popup .leaflet-popup-tip-container {
+  margin-top: -1px;
+}
