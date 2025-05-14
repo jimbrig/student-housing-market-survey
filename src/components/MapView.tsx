@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap, ZoomControl } from 'react-leaflet';
-import { Icon, LatLngBounds, LatLng, DivIcon } from 'leaflet';
+import { Icon, LatLngBounds, LatLng } from 'leaflet';
 import { Building, MapPin, GraduationCap, ChevronLeft } from 'lucide-react';
 import { Coordinates, SubjectProperty, CompetitorProperty, University } from '../types';
 import { Card } from './ui/Card';
@@ -21,8 +21,11 @@ interface Market {
   coordinates: Coordinates;
   properties: (SubjectProperty | CompetitorProperty)[];
   universities: University[];
-  center: Coordinates;
-  radius: number;
+  metrics: {
+    totalUnits: number;
+    averageOccupancy: number;
+    averageRent: number;
+  };
 }
 
 const MapView: React.FC<MapViewProps> = ({
@@ -33,7 +36,6 @@ const MapView: React.FC<MapViewProps> = ({
 }) => {
   const [selectedMarket, setSelectedMarket] = useState<Market | null>(null);
   const [markets, setMarkets] = useState<Market[]>([]);
-  const [hoveredMarket, setHoveredMarket] = useState<string | null>(null);
 
   // Group properties by market (city)
   useEffect(() => {
@@ -43,39 +45,30 @@ const MapView: React.FC<MapViewProps> = ({
     [...subjectProperties, ...competitorProperties].forEach(property => {
       const city = property.address.split(',')[1].trim();
       if (!marketMap.has(city)) {
-        const properties = [...subjectProperties, ...competitorProperties].filter(p => 
+        const marketProperties = [...subjectProperties, ...competitorProperties].filter(p => 
           p.address.split(',')[1].trim() === city
         );
         
-        // Calculate market center and radius using turf.js
-        const points = properties.map(p => turf.point([p.coordinates.longitude, p.coordinates.latitude]));
-        const collection = turf.featureCollection(points);
-        const center = turf.center(collection);
-        
-        // Calculate radius as the distance between center and the furthest point
-        const distances = points.map(point => turf.distance(center, point));
-        const radius = Math.max(...distances) * 1000; // Convert to meters
+        const marketUniversities = universities.filter(u => 
+          u.address.split(',')[1].trim() === city
+        );
+
+        // Calculate market metrics
+        const totalUnits = marketProperties.reduce((sum, p) => sum + p.totalUnits, 0);
+        const averageOccupancy = marketProperties.reduce((sum, p) => sum + ((p as any).occupancyRate || 0), 0) / marketProperties.length;
+        const averageRent = marketProperties.reduce((sum, p) => sum + ((p as any).averageRent || 0), 0) / marketProperties.length;
 
         marketMap.set(city, {
           name: city,
           coordinates: property.coordinates,
-          properties: [],
-          universities: [],
-          center: {
-            latitude: center.geometry.coordinates[1],
-            longitude: center.geometry.coordinates[0]
-          },
-          radius: radius || 5000 // fallback radius in meters
+          properties: marketProperties,
+          universities: marketUniversities,
+          metrics: {
+            totalUnits,
+            averageOccupancy,
+            averageRent
+          }
         });
-      }
-      marketMap.get(city)?.properties.push(property);
-    });
-
-    // Add universities to their respective markets
-    universities.forEach(university => {
-      const city = university.address.split(',')[1].trim();
-      if (marketMap.has(city)) {
-        marketMap.get(city)?.universities.push(university);
       }
     });
 
@@ -94,26 +87,10 @@ const MapView: React.FC<MapViewProps> = ({
     popupAnchor: [0, -size]
   });
 
-  const createMarketIcon = (count: number) => {
-    const size = Math.min(40 + count * 2, 60);
-    return new DivIcon({
-      html: `
-        <div class="relative flex items-center justify-center">
-          <div class="absolute w-${size} h-${size} bg-blue-500 rounded-full opacity-20 animate-pulse"></div>
-          <div class="relative bg-white rounded-lg shadow-lg px-2 py-1 text-sm font-semibold">
-            ${count} Properties
-          </div>
-        </div>
-      `,
-      className: 'custom-market-icon',
-      iconSize: [size, size],
-      iconAnchor: [size/2, size/2]
-    });
-  };
-
   const subjectIcon = createIcon('#2563EB', 32);
   const competitorIcon = createIcon('#F97316', 28);
   const universityIcon = createIcon('#22C55E', 32);
+  const marketIcon = createIcon('#7C3AED', 36);
 
   // Map bounds updater component
   const BoundsUpdater = () => {
@@ -121,7 +98,6 @@ const MapView: React.FC<MapViewProps> = ({
     
     useEffect(() => {
       if (selectedMarket) {
-        // Zoom to selected market with padding
         const bounds = new LatLngBounds(
           selectedMarket.properties.map(p => 
             new LatLng(p.coordinates.latitude, p.coordinates.longitude)
@@ -129,7 +105,6 @@ const MapView: React.FC<MapViewProps> = ({
         );
         map.fitBounds(bounds.pad(0.2));
       } else {
-        // Show entire US with slight padding
         const usBounds = new LatLngBounds(
           new LatLng(25.82, -124.39),
           new LatLng(49.38, -66.94)
@@ -148,6 +123,15 @@ const MapView: React.FC<MapViewProps> = ({
   const handleBackToMarkets = useCallback(() => {
     setSelectedMarket(null);
   }, []);
+
+  const formatCurrency = (value: number) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(value);
+  };
 
   return (
     <Card className="w-full h-full overflow-hidden">
@@ -168,35 +152,45 @@ const MapView: React.FC<MapViewProps> = ({
           <BoundsUpdater />
 
           {!selectedMarket ? (
-            // Show markets with clustering
+            // Show markets overview
             markets.map((market) => (
               <Marker
                 key={market.name}
-                position={[market.center.latitude, market.center.longitude]}
-                icon={createMarketIcon(market.properties.length)}
+                position={[market.coordinates.latitude, market.coordinates.longitude]}
+                icon={marketIcon}
                 eventHandlers={{
-                  click: () => handleMarketClick(market),
-                  mouseover: () => setHoveredMarket(market.name),
-                  mouseout: () => setHoveredMarket(null)
+                  click: () => handleMarketClick(market)
                 }}
               >
                 <Popup className="custom-popup">
-                  <div className="text-sm p-1">
-                    <h3 className="font-semibold text-gray-900">{market.name}</h3>
-                    <div className="mt-2 space-y-1">
-                      <div className="flex items-center text-gray-600">
-                        <Building size={14} className="mr-1" />
-                        <span>{market.properties.length} Properties</span>
+                  <div className="p-3">
+                    <h3 className="font-semibold text-gray-900 mb-2">{market.name} Market</h3>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Properties:</span>
+                        <span className="font-medium">{market.properties.length}</span>
                       </div>
-                      <div className="flex items-center text-gray-600">
-                        <GraduationCap size={14} className="mr-1" />
-                        <span>{market.universities.length} Universities</span>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Total Units:</span>
+                        <span className="font-medium">{market.metrics.totalUnits}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Avg. Occupancy:</span>
+                        <span className="font-medium">
+                          {(market.metrics.averageOccupancy * 100).toFixed(1)}%
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Avg. Rent:</span>
+                        <span className="font-medium">
+                          {formatCurrency(market.metrics.averageRent)}
+                        </span>
                       </div>
                     </div>
                     <Button
                       variant="primary"
                       size="sm"
-                      className="mt-3 w-full"
+                      className="w-full mt-3"
                       onClick={() => handleMarketClick(market)}
                     >
                       View Market Details
@@ -206,7 +200,7 @@ const MapView: React.FC<MapViewProps> = ({
               </Marker>
             ))
           ) : (
-            // Show properties and universities in selected market
+            // Show detailed market view
             <>
               {selectedMarket.properties.map((property) => {
                 const isSubject = subjectProperties.some(p => p.id === property.id);
@@ -216,16 +210,12 @@ const MapView: React.FC<MapViewProps> = ({
                     position={[property.coordinates.latitude, property.coordinates.longitude]}
                     icon={isSubject ? subjectIcon : competitorIcon}
                     eventHandlers={{
-                      click: () => {
-                        if (onSelectProperty) {
-                          onSelectProperty(property.id, isSubject ? 'subject' : 'competitor');
-                        }
-                      }
+                      click: () => onSelectProperty?.(property.id, isSubject ? 'subject' : 'competitor')
                     }}
                   >
                     <Popup className="custom-popup">
-                      <div className="text-sm p-1">
-                        <div className="flex items-start justify-between">
+                      <div className="p-3">
+                        <div className="flex items-center justify-between mb-2">
                           <h3 className="font-semibold text-gray-900">{property.name}</h3>
                           <Badge
                             variant={isSubject ? 'primary' : 'secondary'}
@@ -234,25 +224,31 @@ const MapView: React.FC<MapViewProps> = ({
                             {isSubject ? 'Subject' : 'Competitor'}
                           </Badge>
                         </div>
-                        <p className="text-gray-600 mt-1">{property.address}</p>
-                        <div className="mt-2 grid grid-cols-2 gap-2 text-sm">
-                          <div className="text-gray-600">
-                            <span className="font-medium">{property.totalUnits}</span> units
-                          </div>
-                          <div className="text-gray-600">
-                            <span className="font-medium">{property.totalBeds}</span> beds
-                          </div>
-                          <div className="text-gray-600">
-                            Class <span className="font-medium">{property.classification}</span>
-                          </div>
-                          <div className="text-gray-600">
-                            <span className="font-medium">{property.distanceToCampus}</span> mi
+                        <div className="space-y-2 text-sm">
+                          <div className="text-gray-600">{property.address}</div>
+                          <div className="grid grid-cols-2 gap-2">
+                            <div>
+                              <span className="text-gray-500">Units:</span>
+                              <span className="font-medium ml-1">{property.totalUnits}</span>
+                            </div>
+                            <div>
+                              <span className="text-gray-500">Beds:</span>
+                              <span className="font-medium ml-1">{property.totalBeds}</span>
+                            </div>
+                            <div>
+                              <span className="text-gray-500">Class:</span>
+                              <span className="font-medium ml-1">{property.classification}</span>
+                            </div>
+                            <div>
+                              <span className="text-gray-500">Distance:</span>
+                              <span className="font-medium ml-1">{property.distanceToCampus} mi</span>
+                            </div>
                           </div>
                         </div>
                         <Button
                           variant="primary"
                           size="sm"
-                          className="mt-3 w-full"
+                          className="w-full mt-3"
                           onClick={() => onSelectProperty?.(property.id, isSubject ? 'subject' : 'competitor')}
                         >
                           View Details
@@ -269,33 +265,25 @@ const MapView: React.FC<MapViewProps> = ({
                   position={[university.coordinates.latitude, university.coordinates.longitude]}
                   icon={universityIcon}
                   eventHandlers={{
-                    click: () => {
-                      if (onSelectProperty) {
-                        onSelectProperty(university.id, 'university');
-                      }
-                    }
+                    click: () => onSelectProperty?.(university.id, 'university')
                   }}
                 >
                   <Popup className="custom-popup">
-                    <div className="text-sm p-1">
-                      <h3 className="font-semibold text-gray-900">{university.name}</h3>
-                      <p className="text-gray-600 mt-1">{university.address}</p>
-                      <div className="mt-2 space-y-1">
-                        <div className="text-gray-600">
-                          <span className="font-medium">
+                    <div className="p-3">
+                      <h3 className="font-semibold text-gray-900 mb-2">{university.name}</h3>
+                      <div className="space-y-2 text-sm">
+                        <div className="text-gray-600">{university.address}</div>
+                        <div>
+                          <span className="text-gray-500">Enrollment:</span>
+                          <span className="font-medium ml-1">
                             {university.totalEnrollment.toLocaleString()}
-                          </span> total students
-                        </div>
-                        <div className="text-gray-600">
-                          <span className="font-medium">
-                            {university.undergraduateEnrollment.toLocaleString()}
-                          </span> undergrad
+                          </span>
                         </div>
                       </div>
                       <Button
                         variant="primary"
                         size="sm"
-                        className="mt-3 w-full"
+                        className="w-full mt-3"
                         onClick={() => onSelectProperty?.(university.id, 'university')}
                       >
                         View Details
@@ -314,23 +302,23 @@ const MapView: React.FC<MapViewProps> = ({
             <Button
               variant="white"
               size="sm"
-              className="shadow-lg"
+              className="shadow-lg bg-white"
               onClick={handleBackToMarkets}
               icon={<ChevronLeft size={16} />}
             >
-              Back to Markets
+              Back to National View
             </Button>
           )}
         </div>
 
         {/* Map Legend */}
-        <div className="absolute bottom-4 left-4 bg-white p-3 rounded-lg shadow-lg z-[1000]">
+        <div className="absolute bottom-4 left-4 bg-white/90 backdrop-blur-sm p-3 rounded-lg shadow-lg z-[1000]">
           <div className="text-sm font-medium text-gray-900 mb-2">Legend</div>
           <div className="space-y-2 text-sm">
             {!selectedMarket ? (
               <div className="flex items-center text-gray-600">
-                <div className="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center mr-2">
-                  <MapPin size={14} className="text-blue-600" />
+                <div className="w-6 h-6 rounded-full bg-purple-100 flex items-center justify-center mr-2">
+                  <MapPin size={14} className="text-purple-600" />
                 </div>
                 <span>Market Location</span>
               </div>
