@@ -162,3 +162,43 @@ export const performanceData = {
     { year: 2024, studio: 950, oneBed: 1150, twoBed: 1800, threeBed: 2500, fourBed: 3350 }
   ]
 };
+
+// Unit configurations data
+export const unitConfigurations = [
+  {
+    id: '1',
+    floorPlanName: 'Studio',
+    bedrooms: 0,
+    bathrooms: 1,
+    squareFeet: 450,
+    baseRent: 950,
+    amenities: ['Kitchenette', 'Built-in Desk', 'Smart TV']
+  },
+  {
+    id: '2',
+    floorPlanName: '1 Bedroom',
+    bedrooms: 1,
+    bathrooms: 1,
+    squareFeet: 650,
+    baseRent: 1150,
+    amenities: ['Full Kitchen', 'Walk-in Closet', 'Private Balcony']
+  },
+  {
+    id: '3',
+    floorPlanName: '2 Bedroom',
+    bedrooms: 2,
+    bathrooms: 2,
+    squareFeet: 900,
+    baseRent: 1800,
+    amenities: ['In-Unit Laundry', 'Dual Vanities', 'Smart Thermostat']
+  },
+  {
+    id: '4',
+    floorPlanName: '4 Bedroom',
+    bedrooms: 4,
+    bathrooms: 4,
+    squareFeet: 1400,
+    baseRent: 3350,
+    amenities: ['Private Bathrooms', 'Common Living Area', 'Kitchen Island']
+  }
+];
