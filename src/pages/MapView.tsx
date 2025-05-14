@@ -1,22 +1,22 @@
 import React, { useState } from 'react';
 import { subjectProperties, competitorProperties, universities } from '../data/mockData';
-import { MapView as MapComponent } from '../components/MapView';
+import MapView from '../components/MapView';
 import { PropertyCard } from '../components/PropertyCard';
 import { UniversityCard } from '../components/UniversityCard';
 import { Select } from '../components/ui/Select';
 import { Button } from '../components/ui/Button';
 import { Search, Filter, X } from 'lucide-react';
 
-interface MapViewProps {
+interface MapViewPageProps {
   onViewPropertyDetails: (id: string) => void;
 }
 
-export const MapViewPage: React.FC<MapViewProps> = ({ onViewPropertyDetails }) => {
+export const MapViewPage: React.FC<MapViewPageProps> = ({ onViewPropertyDetails }) => {
   const [selectedEntityType, setSelectedEntityType] = useState<string>('');
   const [selectedEntity, setSelectedEntity] = useState<string | null>(null);
   
   const filterOptions = [
-    { value: '', label: 'All Properties' },
+    { value: '', label: 'All Markets' },
     { value: 'subject', label: 'Subject Properties' },
     { value: 'competitor', label: 'Competitor Properties' },
     { value: 'university', label: 'Universities' }
@@ -82,7 +82,7 @@ export const MapViewPage: React.FC<MapViewProps> = ({ onViewPropertyDetails }) =
       
       <div className="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 h-full">
-          <MapComponent
+          <MapView
             subjectProperties={subjectProperties}
             competitorProperties={competitorProperties}
             universities={universities}
@@ -108,21 +108,19 @@ export const MapViewPage: React.FC<MapViewProps> = ({ onViewPropertyDetails }) =
                 {selectedEntityType === 'university' ? (
                   <UniversityCard university={selectedEntityData} />
                 ) : (
-                  <div className="space-y-4">
-                    <PropertyCard 
-                      property={selectedEntityData}
-                      onViewDetails={onViewPropertyDetails}
-                    />
-                  </div>
+                  <PropertyCard 
+                    property={selectedEntityData}
+                    onViewDetails={onViewPropertyDetails}
+                  />
                 )}
               </div>
             </div>
           ) : (
             <div className="bg-white rounded-lg border border-gray-200 shadow-sm h-full flex items-center justify-center p-6">
               <div className="text-center">
-                <h3 className="text-lg font-medium text-gray-900 mb-2">Select a property</h3>
+                <h3 className="text-lg font-medium text-gray-900 mb-2">Select a location</h3>
                 <p className="text-sm text-gray-500">
-                  Click on a marker on the map to view details about properties and universities.
+                  Click on a marker on the map to view details about markets, properties, and universities.
                 </p>
               </div>
             </div>
