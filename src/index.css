@@ -37,7 +37,14 @@
 }
 
 .leaflet-marker-icon:hover {
-  transform: scale(1.1) translateY(-5px);
+  transform: scale(1.1);
+}
+
+.marker-subject img,
+.marker-competitor img,
+.marker-university img,
+.marker-market img {
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
 }
 
 .map-controls {

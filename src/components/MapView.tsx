@@ -40,7 +40,6 @@ const MapView: React.FC<MapViewProps> = ({
   useEffect(() => {
     const marketMap = new Map<string, Market>();
     
-    // Group properties by market
     [...subjectProperties, ...competitorProperties].forEach(property => {
       const market = property.market;
       if (!marketMap.has(market)) {
@@ -54,8 +53,8 @@ const MapView: React.FC<MapViewProps> = ({
 
         // Calculate market metrics
         const totalUnits = marketProperties.reduce((sum, p) => sum + p.totalUnits, 0);
-        const averageOccupancy = marketProperties.reduce((sum, p) => sum + ((p as any).occupancyRate || 0), 0) / marketProperties.length;
-        const averageRent = marketProperties.reduce((sum, p) => sum + ((p as any).averageRent || 0), 0) / marketProperties.length;
+        const averageOccupancy = marketProperties.reduce((sum, p) => sum + p.occupancyRate, 0) / marketProperties.length;
+        const averageRent = marketProperties.reduce((sum, p) => sum + p.averageRent, 0) / marketProperties.length;
 
         // Use coordinates of the first subject property as market center
         const subjectProperty = subjectProperties.find(p => p.market === market);
@@ -77,28 +76,29 @@ const MapView: React.FC<MapViewProps> = ({
     setMarkets(Array.from(marketMap.values()));
   }, [subjectProperties, competitorProperties, universities]);
 
-  // Custom icons
-  const createIcon = (color: string, iconPath: string, size: number = 24) => new Icon({
-    iconUrl: `data:image/svg+xml;base64,${btoa(`
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="${size}" height="${size}">
-        <circle cx="12" cy="12" r="10" fill="${color}" opacity="0.2"/>
-        <path fill="${color}" d="${iconPath}"/>
-      </svg>
-    `)}`,
-    iconSize: [size, size],
-    iconAnchor: [size/2, size/2],
-    popupAnchor: [0, -size/2]
-  });
+  // Create marker icons
+  const createMarkerIcon = (color: string, type: 'subject' | 'competitor' | 'university' | 'market') => {
+    const size = type === 'market' ? 36 : 28;
+    const bgSize = size * 1.5;
+    
+    return new Icon({
+      iconUrl: `data:image/svg+xml;base64,${btoa(`
+        <svg xmlns="http://www.w3.org/2000/svg" width="${bgSize}" height="${bgSize}" viewBox="0 0 ${bgSize} ${bgSize}">
+          <circle cx="${bgSize/2}" cy="${bgSize/2}" r="${size/2}" fill="${color}" fill-opacity="0.15"/>
+          <circle cx="${bgSize/2}" cy="${bgSize/2}" r="${size/3}" fill="${color}"/>
+        </svg>
+      `)}`,
+      iconSize: [bgSize, bgSize],
+      iconAnchor: [bgSize/2, bgSize/2],
+      popupAnchor: [0, -bgSize/2],
+      className: `marker-${type}`
+    });
+  };
 
-  // Lucide icon paths
-  const buildingPath = "M6 22V3a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v19M6 12h12M12 22V12";
-  const mapPinPath = "M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z M12 10a2 2 0 1 0 0-4 2 2 0 0 0 0 4z";
-  const graduationPath = "M22 10v6M2 10l10-5 10 5-10 5z M6 12v5c3 3 9 3 12 0v-5";
-
-  const subjectIcon = createIcon('#2563EB', buildingPath, 32);
-  const competitorIcon = createIcon('#F97316', mapPinPath, 28);
-  const universityIcon = createIcon('#22C55E', graduationPath, 32);
-  const marketIcon = createIcon('#7C3AED', mapPinPath, 36);
+  const subjectIcon = createMarkerIcon('#2563EB', 'subject');
+  const competitorIcon = createMarkerIcon('#F97316', 'competitor');
+  const universityIcon = createMarkerIcon('#22C55E', 'university');
+  const marketIcon = createMarkerIcon('#7C3AED', 'market');
 
   // Map bounds updater component
   const BoundsUpdater = () => {
@@ -211,7 +211,7 @@ const MapView: React.FC<MapViewProps> = ({
             // Show detailed market view
             <>
               {selectedMarket.properties.map((property) => {
-                const isSubject = 'competitiveSetId' in property;
+                const isSubject = !('associatedSubjectPropertyId' in property);
                 return (
                   <Marker
                     key={property.id}
