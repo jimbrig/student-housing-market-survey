@@ -6,8 +6,8 @@ export type Coordinates = {
 
 // Property Types
 export type PropertyStatus = 'active' | 'inactive' | 'development';
-export type PropertyType = 'garden' | 'mid-rise' | 'high-rise' | 'townhome' | 'house';
-export type PropertyClassification = 'A' | 'B' | 'C' | 'D';
+export type PropertyType = 'garden' | 'mid-rise' | 'high-rise' | 'townhome' | 'house' | 'cottage';
+export type PropertyClassification = 'A' | 'A-' | 'B+' | 'B' | 'B-' | 'C+' | 'C' | 'C-' | 'D';
 
 export interface BaseProperty {
   id: string;
@@ -24,6 +24,7 @@ export interface BaseProperty {
   distanceToCampus: number; // in miles
   status: PropertyStatus;
   imageUrl: string;
+  market: string;
 }
 
 export interface SubjectProperty extends BaseProperty {
@@ -32,14 +33,16 @@ export interface SubjectProperty extends BaseProperty {
   averageRent: number;
   occupancyRate: number;
   preleaseRate: number;
+  competitiveSetId: string;
 }
 
 export interface CompetitorProperty extends BaseProperty {
   competitiveSetId: string;
   marketPosition: number; // 1-10 scale
-  averageRent?: number;
-  occupancyRate?: number;
-  preleaseRate?: number;
+  averageRent: number;
+  occupancyRate: number;
+  preleaseRate: number;
+  associatedSubjectPropertyId: string;
 }
 
 // University Types
@@ -57,6 +60,7 @@ export interface University {
   housingRequirement: string;
   academicCalendar: string;
   logoUrl: string;
+  market: string;
 }
 
 // Metrics Types

@@ -23,7 +23,9 @@ export const subjectProperties: SubjectProperty[] = [
     amenities: ["Modern Appliances", "Hardwood-style Flooring", "Flat-screen TV", "Furnished Units"],
     averageRent: 1200,
     occupancyRate: 0.95,
-    preleaseRate: 0.72
+    preleaseRate: 0.72,
+    competitiveSetId: "CS1",
+    market: "Sacramento"
   },
   {
     id: "P518041",
@@ -42,7 +44,9 @@ export const subjectProperties: SubjectProperty[] = [
     amenities: ["Designer-inspired Finishes", "Study Spaces", "Fitness Center", "Co-working Areas"],
     averageRent: 1100,
     occupancyRate: 0.97,
-    preleaseRate: 0.68
+    preleaseRate: 0.68,
+    competitiveSetId: "CS2",
+    market: "Fayetteville"
   },
   {
     id: "P1197887",
@@ -61,7 +65,9 @@ export const subjectProperties: SubjectProperty[] = [
     amenities: ["Rooftop Pool", "Fitness Center", "Study Lounges", "Furnished Units"],
     averageRent: 1400,
     occupancyRate: 0.98,
-    preleaseRate: 0.85
+    preleaseRate: 0.85,
+    competitiveSetId: "CS3",
+    market: "Reno"
   }
 ];
 
@@ -85,7 +91,31 @@ export const competitorProperties: CompetitorProperty[] = [
     marketPosition: 1,
     averageRent: 1250,
     occupancyRate: 0.96,
-    preleaseRate: 0.75
+    preleaseRate: 0.75,
+    market: "Sacramento",
+    associatedSubjectPropertyId: "P641240"
+  },
+  {
+    id: "C641240-002",
+    name: "The Union",
+    address: "2901 University Ave, Sacramento, CA 95826",
+    coordinates: { latitude: 38.5582, longitude: -121.4225 },
+    managementCompany: "Peak Campus",
+    propertyType: "mid-rise",
+    classification: "A",
+    totalUnits: 130,
+    totalBeds: 350,
+    yearBuilt: 2019,
+    distanceToCampus: 0.3,
+    status: "active",
+    imageUrl: "https://storage.googleapis.com/gmh-images/competitors/the-union/the-union.webp",
+    competitiveSetId: "CS1",
+    marketPosition: 2,
+    averageRent: 1180,
+    occupancyRate: 0.94,
+    preleaseRate: 0.71,
+    market: "Sacramento",
+    associatedSubjectPropertyId: "P641240"
   },
   {
     id: "C518041-001",
@@ -105,7 +135,31 @@ export const competitorProperties: CompetitorProperty[] = [
     marketPosition: 2,
     averageRent: 1150,
     occupancyRate: 0.94,
-    preleaseRate: 0.70
+    preleaseRate: 0.70,
+    market: "Fayetteville",
+    associatedSubjectPropertyId: "P518041"
+  },
+  {
+    id: "C518041-002",
+    name: "The Vue on Stadium",
+    address: "1455 W Stadium Dr., Fayetteville, AR 72701",
+    coordinates: { latitude: 36.0675, longitude: -94.1895 },
+    managementCompany: "American Campus Communities",
+    propertyType: "mid-rise",
+    classification: "A",
+    totalUnits: 180,
+    totalBeds: 450,
+    yearBuilt: 2020,
+    distanceToCampus: 0.9,
+    status: "active",
+    imageUrl: "https://storage.googleapis.com/gmh-images/competitors/the-vue/the-vue.webp",
+    competitiveSetId: "CS2",
+    marketPosition: 3,
+    averageRent: 1170,
+    occupancyRate: 0.93,
+    preleaseRate: 0.68,
+    market: "Fayetteville",
+    associatedSubjectPropertyId: "P518041"
   },
   {
     id: "C1197887-001",
@@ -125,11 +179,35 @@ export const competitorProperties: CompetitorProperty[] = [
     marketPosition: 3,
     averageRent: 1350,
     occupancyRate: 0.95,
-    preleaseRate: 0.73
+    preleaseRate: 0.73,
+    market: "Reno",
+    associatedSubjectPropertyId: "P1197887"
+  },
+  {
+    id: "C1197887-002",
+    name: "Wolf Run Student Living",
+    address: "1675 N Virginia St, Reno, NV 89503",
+    coordinates: { latitude: 39.5299, longitude: -119.8142 },
+    managementCompany: "Asset Living",
+    propertyType: "garden",
+    classification: "B+",
+    totalUnits: 160,
+    totalBeds: 400,
+    yearBuilt: 2018,
+    distanceToCampus: 0.4,
+    status: "active",
+    imageUrl: "https://storage.googleapis.com/gmh-images/competitors/wolf-run/wolf-run.webp",
+    competitiveSetId: "CS3",
+    marketPosition: 4,
+    averageRent: 1280,
+    occupancyRate: 0.92,
+    preleaseRate: 0.69,
+    market: "Reno",
+    associatedSubjectPropertyId: "P1197887"
   }
 ];
 
-// Universities data remains the same since we don't have detailed university information in the provided data
+// Universities data
 export const universities = [
   {
     id: "u1",
@@ -142,9 +220,50 @@ export const universities = [
     graduateEnrollment: 4000,
     housingRequirement: "First-year students only",
     academicCalendar: "Semester",
-    logoUrl: "https://www.csus.edu/brand/assets/images/primary-logo.png"
+    logoUrl: "https://www.csus.edu/brand/assets/images/primary-logo.png",
+    market: "Sacramento"
+  },
+  {
+    id: "u2",
+    name: "University of Arkansas",
+    address: "340 N Campus Dr, Fayetteville, AR 72701",
+    coordinates: { latitude: 36.0679, longitude: -94.1737 },
+    campusType: "public",
+    totalEnrollment: 29000,
+    undergraduateEnrollment: 24000,
+    graduateEnrollment: 5000,
+    housingRequirement: "First-year students only",
+    academicCalendar: "Semester",
+    logoUrl: "https://branding.uark.edu/_resources/images/UA-logo.png",
+    market: "Fayetteville"
+  },
+  {
+    id: "u3",
+    name: "University of Nevada, Reno",
+    address: "1664 N Virginia St, Reno, NV 89557",
+    coordinates: { latitude: 39.5296, longitude: -119.8138 },
+    campusType: "public",
+    totalEnrollment: 21000,
+    undergraduateEnrollment: 17000,
+    graduateEnrollment: 4000,
+    housingRequirement: "First-year students only",
+    academicCalendar: "Semester",
+    logoUrl: "https://www.unr.edu/main/images/unr-logo.png",
+    market: "Reno"
   }
 ];
+
+// Helper function to get competitors for a subject property
+export const getCompetitorsForSubjectProperty = (subjectPropertyId: string): CompetitorProperty[] => {
+  return competitorProperties.filter(comp => comp.associatedSubjectPropertyId === subjectPropertyId);
+};
+
+// Helper function to get all properties in a market
+export const getPropertiesInMarket = (market: string): (SubjectProperty | CompetitorProperty)[] => {
+  const subjectProps = subjectProperties.filter(prop => prop.market === market);
+  const competitorProps = competitorProperties.filter(prop => prop.market === market);
+  return [...subjectProps, ...competitorProps];
+};
 
 // Performance metrics data
 export const performanceData = {
