@@ -76,27 +76,28 @@ const MapView: React.FC<MapViewProps> = ({
     setMarkets(Array.from(marketMap.values()));
   }, [subjectProperties, competitorProperties, universities]);
 
-  // Create marker icons with Lucide icons
+  // Create marker icons
   const createMarkerIcon = (type: 'subject' | 'competitor' | 'university' | 'market') => {
-    const getIconSvg = () => {
-      switch (type) {
-        case 'subject':
-          return `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"/><path d="M9 18V6l7 6-7 6z"/></svg>`;
-        case 'competitor':
-          return `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#F97316" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>`;
-        case 'university':
-          return `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>`;
-        case 'market':
-          return `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>`;
-      }
+    const bgColors = {
+      subject: '#2563EB',
+      competitor: '#F97316',
+      university: '#22C55E',
+      market: '#7C3AED'
     };
 
     const size = type === 'market' ? 40 : 32;
-    const iconSize = [size, size];
+    const color = bgColors[type];
     
+    const svg = `
+      <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="${size/2}" cy="${size/2}" r="${size/2-2}" fill="white"/>
+        <circle cx="${size/2}" cy="${size/2}" r="${size/2-4}" fill="${color}"/>
+      </svg>
+    `;
+
     return new Icon({
-      iconUrl: `data:image/svg+xml;base64,${btoa(getIconSvg())}`,
-      iconSize: iconSize,
+      iconUrl: `data:image/svg+xml;base64,${btoa(svg)}`,
+      iconSize: [size, size],
       iconAnchor: [size/2, size/2],
       popupAnchor: [0, -size/2],
       className: `marker-${type}`
