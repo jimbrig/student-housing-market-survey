@@ -38,7 +38,7 @@ export const subjectProperties: SubjectProperty[] = [
     yearBuilt: 2020,
     distanceToCampus: 0.5,
     status: "active",
-    imageUrl: "https://storage.googleapis.com/gmh-images/properties/518041/property/the_academy_at_frisco.jpg",
+    imageUrl: "https://storage.googleapis.com/gmh-images/properties/518041/property/academy_at_frisco.jpg",
     amenities: ["Designer-inspired Finishes", "Study Spaces", "Fitness Center", "Co-working Areas"],
     averageRent: 1100,
     occupancyRate: 0.97,
