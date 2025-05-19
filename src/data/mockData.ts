@@ -220,7 +220,7 @@ export const universities = [
     graduateEnrollment: 4000,
     housingRequirement: "First-year students only",
     academicCalendar: "Semester",
-    logoUrl: "https://www.csus.edu/brand/assets/images/primary-logo.png",
+    logoUrl: "https://www.csus.edu/NewCSUS2019-global-assets/_internal/images/logo-horizontal.png",
     market: "Sacramento"
   },
   {
@@ -234,7 +234,7 @@ export const universities = [
     graduateEnrollment: 5000,
     housingRequirement: "First-year students only",
     academicCalendar: "Semester",
-    logoUrl: "https://branding.uark.edu/_resources/images/UA-logo.png",
+    logoUrl: "https://includes.uark.edu/assets/ua-logo-horz.svg",
     market: "Fayetteville"
   },
   {
@@ -248,7 +248,7 @@ export const universities = [
     graduateEnrollment: 4000,
     housingRequirement: "First-year students only",
     academicCalendar: "Semester",
-    logoUrl: "https://www.unr.edu/main/images/unr-logo.png",
+    logoUrl: "https://www.unr.edu/Assets/Icons/logos/university-logo.svg",
     market: "Reno"
   }
 ];
