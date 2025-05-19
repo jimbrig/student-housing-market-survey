@@ -254,12 +254,12 @@ export const universities = [
 ];
 
 // Helper function to get competitors for a subject property
-export const getCompetitorsForSubjectProperty = (subjectPropertyId: string): CompetitorProperty[] => {
+const getCompetitorsForSubjectProperty = (subjectPropertyId: string): CompetitorProperty[] => {
   return competitorProperties.filter(comp => comp.associatedSubjectPropertyId === subjectPropertyId);
 };
 
 // Helper function to get all properties in a market
-export const getPropertiesInMarket = (market: string): (SubjectProperty | CompetitorProperty)[] => {
+const getPropertiesInMarket = (market: string): (SubjectProperty | CompetitorProperty)[] => {
   const subjectProps = subjectProperties.filter(prop => prop.market === market);
   const competitorProps = competitorProperties.filter(prop => prop.market === market);
   return [...subjectProps, ...competitorProps];

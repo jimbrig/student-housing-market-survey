@@ -5,9 +5,9 @@ export type Coordinates = {
 };
 
 // Property Types
-export type PropertyStatus = 'active' | 'inactive' | 'development';
-export type PropertyType = 'garden' | 'mid-rise' | 'high-rise' | 'townhome' | 'house' | 'cottage';
-export type PropertyClassification = 'A' | 'A-' | 'B+' | 'B' | 'B-' | 'C+' | 'C' | 'C-' | 'D';
+type PropertyStatus = 'active' | 'inactive' | 'development';
+type PropertyType = 'garden' | 'mid-rise' | 'high-rise' | 'townhome' | 'house' | 'cottage';
+type PropertyClassification = 'A' | 'A-' | 'B+' | 'B' | 'B-' | 'C+' | 'C' | 'C-' | 'D';
 
 export interface BaseProperty {
   id: string;
@@ -46,7 +46,7 @@ export interface CompetitorProperty extends BaseProperty {
 }
 
 // University Types
-export type CampusType = 'public' | 'private';
+type CampusType = 'public' | 'private';
 
 export interface University {
   id: string;
@@ -64,7 +64,7 @@ export interface University {
 }
 
 // Metrics Types
-export interface FinancialMetrics {
+interface FinancialMetrics {
   baseRent: number;
   effectiveRent: number;
   pricePerSqFt: number;
@@ -73,27 +73,27 @@ export interface FinancialMetrics {
   revenuePerUnit?: number;
 }
 
-export interface OccupancyMetrics {
+interface OccupancyMetrics {
   currentOccupancy: number; // percentage
   preleasePercentage: number;
   retentionRate?: number;
 }
 
-export interface MarketMetrics {
+interface MarketMetrics {
   concessionValue?: number;
   marketPenetrationRate?: number;
   competitiveIndex?: number;
 }
 
 // Feature Types
-export interface PropertyFeature {
+interface PropertyFeature {
   id: string;
   category: string;
   name: string;
   description?: string;
 }
 
-export interface UnitConfiguration {
+interface UnitConfiguration {
   id: string;
   floorPlanName: string;
   bedrooms: number;
