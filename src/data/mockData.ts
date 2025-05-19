@@ -234,7 +234,7 @@ export const universities = [
     graduateEnrollment: 5000,
     housingRequirement: "First-year students only",
     academicCalendar: "Semester",
-    logoUrl: "https://includes.uark.edu/assets/ua-logo-horz.svg",
+    logoUrl: "https://brand.uark.edu/_resources/images/UA_Logo.png",
     market: "Fayetteville"
   },
   {
