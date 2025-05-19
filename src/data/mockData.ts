@@ -220,7 +220,7 @@ export const universities = [
     graduateEnrollment: 4000,
     housingRequirement: "First-year students only",
     academicCalendar: "Semester",
-    logoUrl: "https://www.csus.edu/NewCSUS2019-global-assets/_internal/images/logo-horizontal.png",
+    logoUrl: "https://www.csus.edu/newcsus2019-global-assets/_internal/images/logo/primary-vertical/primary_vertical_2_color_gld_hnd.png",
     market: "Sacramento"
   },
   {
